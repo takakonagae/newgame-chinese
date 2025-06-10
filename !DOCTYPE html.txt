@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>中国語数字学習ゲーム</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 30px;
+    }
+    .number-panel {
+      display: inline-block;
+      width: 60px;
+      height: 60px;
+      margin: 10px;
+      font-size: 24px;
+      line-height: 60px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: white;
+    }
+    .correct {
+      background-color: #8f8;
+    }
+    .incorrect {
+      background-color: #f88;
+    }
+    #info {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    #score {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>中国語数字学習ゲーム</h1>
+  <button onclick="playSound()">発音を聞く</button>
+  <div id="panels"></div>
+  <div id="info"></div>
+  <div id="score"></div>
+
+  <script>
+    const data = {
+      1: {zh: "一", pinyin: "yī"},
+      2: {zh: "二", pinyin: "èr"},
+      3: {zh: "三", pinyin: "sān"},
+      4: {zh: "四", pinyin: "sì"},
+      5: {zh: "五", pinyin: "wǔ"},
+      6: {zh: "六", pinyin: "liù"},
+      7: {zh: "七", pinyin: "qī"},
+      8: {zh: "八", pinyin: "bā"},
+      9: {zh: "九", pinyin: "jiǔ"}
+    };
+
+    let correctAnswer = null;
+    let correctCount = 0;
+    let incorrectCount = 0;
+
+    const panels = document.getElementById('panels');
+    const info = document.getElementById('info');
+    const score = document.getElementById('score');
+
+    for (let i = 1; i <= 9; i++) {
+      const div = document.createElement('div');
+      div.className = 'number-panel';
+      div.textContent = i;
+      div.onclick = () => checkAnswer(i, div);
+      panels.appendChild(div);
+    }
+
+    function playSound() {
+      resetColors();
+      info.textContent = "";
+      correctAnswer = Math.floor(Math.random() * 9) + 1;
+      const utterance = new SpeechSynthesisUtterance(data[correctAnswer].zh);
+      utterance.lang = 'zh-CN';
+      speechSynthesis.speak(utterance);
+    }
+
+    function checkAnswer(num, element) {
+      if (correctAnswer === null) return;
+
+      if (num === correctAnswer) {
+        element.classList.add('correct');
+        info.innerHTML = `正解！ ${data[num].zh} (${data[num].pinyin})`;
+        correctCount++;
+      } else {
+        element.classList.add('incorrect');
+        info.textContent = "不正解...";
+        incorrectCount++;
+      }
+      updateScore();
+      correctAnswer = null;
+    }
+
+    function resetColors() {
+      document.querySelectorAll('.number-panel').forEach(panel => {
+        panel.classList.remove('correct', 'incorrect');
+      });
+    }
+
+    function updateScore() {
+      score.textContent = `正解数: ${correctCount}　不正解数: ${incorrectCount}`;
+    }
+  </script>
+</body>
+</html>
